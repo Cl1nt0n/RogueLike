@@ -1,0 +1,11 @@
+D:\clessons\RogueLikeProject\RogueLikeProject\bin\Debug\RogueLikeProject.exe.config
+D:\clessons\RogueLikeProject\RogueLikeProject\bin\Debug\RogueLikeProject.exe
+D:\clessons\RogueLikeProject\RogueLikeProject\bin\Debug\RogueLikeProject.pdb
+D:\clessons\RogueLikeProject\RogueLikeProject\obj\Debug\RogueLikeProject.csprojAssemblyReference.cache
+D:\clessons\RogueLikeProject\RogueLikeProject\obj\Debug\RogueLikeProject.Properties.Resources.resources
+D:\clessons\RogueLikeProject\RogueLikeProject\obj\Debug\RogueLikeProject.Resource.resources
+D:\clessons\RogueLikeProject\RogueLikeProject\obj\Debug\RogueLikeProject.csproj.GenerateResource.cache
+D:\clessons\RogueLikeProject\RogueLikeProject\obj\Debug\RogueLikeProject.csproj.CoreCompileInputs.cache
+D:\clessons\RogueLikeProject\RogueLikeProject\obj\Debug\RogueLikeProject.exe
+D:\clessons\RogueLikeProject\RogueLikeProject\obj\Debug\RogueLikeProject.pdb
+D:\clessons\RogueLikeProject\RogueLikeProject\obj\Debug\RogueLikeProject.Form1.resources
