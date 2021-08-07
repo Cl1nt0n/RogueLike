@@ -52,8 +52,9 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="InteractionObjects\Corpse.cs" />
+    <Compile Include="InteractionObjects\Enemy.cs" />
     <Compile Include="InteractionObjects\InteractionObject.cs" />
+    <Compile Include="InteractionObjects\Player.cs" />
     <Compile Include="InteractionObjects\Vector2.cs" />
     <Compile Include="Map\Map.cs" />
     <Compile Include="Map\MapElement.cs" />
@@ -96,13 +97,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\floor.jpg" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\player.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\wall.jpg" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\playerRight.png" />
@@ -148,6 +143,27 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\deadEnemy.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\deadPlayer.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\wall.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Wall.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\floor %282%29.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\floor %283%29.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\floor__4.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\floor.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

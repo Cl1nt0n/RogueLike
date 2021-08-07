@@ -113,6 +113,16 @@ namespace RogueLikeProject {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap deadPlayer {
+            get {
+                object obj = ResourceManager.GetObject("deadPlayer", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap enemyDown {
             get {
                 object obj = ResourceManager.GetObject("enemyDown", resourceCulture);

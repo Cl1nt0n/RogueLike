@@ -1,4 +1,5 @@
 ﻿using RogueLikeProject.GameWorld;
+using RogueLikeProject.InteractionObjects;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -14,21 +15,23 @@ namespace RogueLikeProject
 {
     public partial class Form1 : Form
     {
-        Map map;
-        Unit player;
-        List<Unit> enemies;
-        List<Timer> enemeisTimers;
-        Graphics graphics;
-        Random random;
+        private Map _map;
+        private Unit _player;
+        private List<Unit> _enemies;
+        private List<Timer> _enemiesTimers;
+        private Graphics _graphics;
+        private Random _random;
+
+        private event Action GameSpaceSpawning;
 
         public Form1()
         {
             InitializeComponent();
-            map = new Map();
-            player = new Player();
-            enemies = new List<Unit>();
-            enemeisTimers = new List<Timer>();
-            random = new Random();
+            _map = new Map();
+            _enemies = new List<Unit>();
+            _player = new Player(_map);
+            _enemiesTimers = new List<Timer>();
+            _random = new Random();
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -36,37 +39,62 @@ namespace RogueLikeProject
             SoundPlayer simpleSound = new SoundPlayer(@"C:\Users\ЧинякOFF\Downloads\hotline_miami_04. M.O.O.N - Crystals (online-audio-converter.com).wav");
             //simpleSound.Play();
 
-            LoadGameSpace();
+            playerHealthBar.Maximum = _player.Hp;
 
-        }
-
-        private void LoadGameSpace()
-        {
-            map.Load();
-            AddEnemies();
-            for (int i = 0; i < enemeisTimers.Count; i++)
-            {
-                enemeisTimers[i].Interval = random.Next(1000, 10000);
-                enemeisTimers[i].Enabled = true;
-                enemeisTimers[i].Tick += (object sender, EventArgs e) => (enemies[i] as Enemy).Walk(map);
-            }
-
-            pictureBoxMap.Width = map.Width;
-            pictureBoxMap.Height = map.Height;
-
-            playerHealthBar.Maximum = player.Hp;
-            playerHealthBar.Value = player.Hp;
+            pictureBoxMap.Width = _map.Width;
+            pictureBoxMap.Height = _map.Height;
 
             this.Width = pictureBoxMap.Width + 50;
             this.Height = pictureBoxMap.Height + 85;
 
+            LoadGameSpace();
+
+            GameSpaceSpawning += () =>
+            {
+                _map = new Map();
+                _enemies = new List<Unit>();
+                _enemiesTimers = new List<Timer>();
+                LoadGameSpace();
+            };
+        }
+
+        private void LoadGameSpace()
+        {
+            _map.Load();
+
+            AddEnemies();
+            (_player as Player).Spawn(_map);
+
+            playerHealthBar.Value = _player.Hp;
+
             pictureBoxMap.Image = new Bitmap(pictureBoxMap.Width, pictureBoxMap.Height);
-            graphics = Graphics.FromImage(pictureBoxMap.Image);
+            _graphics = Graphics.FromImage(pictureBoxMap.Image);
 
-            map.Print(graphics);
-            player.Print(graphics);
+            _map.Print(_graphics);
+            _player.Print(_graphics);
 
-            (player as Player).StatsChanged += () => (player as Player).ShowStatistic(CheckCount);
+            for (int i = 0; i < _enemies.Count; i++)
+            {
+                int index = i;
+                _enemiesTimers[index].Enabled = true;
+                _enemiesTimers[index].Tick += (object sender, EventArgs e) => _enemiesTimers[index].Interval = _random.Next(100, 800);
+                _enemiesTimers[index].Tick += (object sender, EventArgs e) => (_enemies[index] as Enemy).Walk(_map, (_player as Player));
+                _enemies[index].Dying += () =>
+                {
+                    for (int j = 0; j < _enemies.Count; j++)
+                    {
+                        if (_enemies[j].IsAlive == true)
+                        {
+                            return;
+                        }
+                    }
+
+                    GameSpaceSpawning?.Invoke();
+                };
+            }
+
+            (_player as Player).StatsChanged += () => (_player as Player).ShowStatistic(CheckCount);
+            (_player as Player).HpChanged += () => { (_player as Player).ShowHp(CheckHp); playerHealthBar.MarqueeAnimationSpeed = 0; };
         }
 
         private void CheckCount(string str)
@@ -74,95 +102,70 @@ namespace RogueLikeProject
             labelBountyCount.Text = str;
         }
 
+        private void CheckHp(string str)
+        {
+            try
+            {
+                playerHealthBar.Value = int.Parse(str);
+            }
+            catch (Exception)
+            {
+                playerHealthBar.Value = 0;
+            }
+        }
+
         private void timer_Tick(object sender, EventArgs e)
         {
-            //for (int i = 0; i < enemies.Count; i++)
-            //{
-            //    (enemies[i] as Enemy).Walk(map);
-            //}
-            //enemy.Print(graphics);
-            //player.Print(graphics);
             pictureBoxMap.Invalidate();
         }
 
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
-            (player as Player).Walk(map, e);
+            (_player as Player).Walk(_map, e);
             pictureBoxMap.Invalidate();
         }
 
         private void pictureBoxMap_Paint(object sender, PaintEventArgs e)
         {
-            map.Print(graphics);
-            for (int i = 0; i < enemies.Count; i++)
+            _map.Print(_graphics);
+            for (int i = 0; i < _enemies.Count; i++)
             {
-                (enemies[i] as Enemy).Print(graphics);
+                int index = i;
+                (_enemies[i] as Enemy).Update(new List<Unit> { _player }, _graphics);
+                (_enemies[i] as Enemy).Print(_graphics);
             }
-            player.Print(graphics);
-            player.Update(graphics, enemies);
+            _player.Print(_graphics);
+            _player.Update(_enemies, _graphics);
         }
 
         private void pictureBoxMap_MouseClick(object sender, MouseEventArgs e)
         {
-            (player as Player).Shot(map);
-            PlayShotSound();
-            timerShot.Enabled = true;
-            if (CheckIsEnemiesAlive() == false)
-            {
-                map = new Map();
-                player = new Player();
-                enemies = new List<Unit>();
-                LoadGameSpace();
-            }
-        }
-
-        private void PlayShotSound()
-        {
-            SoundPlayer simpleSound = new SoundPlayer(@"C:\Users\ЧинякOFF\Downloads\z_uk-vystrel-s-pistoleta(1) (2) (1).wav");
-            simpleSound.Play();
-        } 
-
-        private bool CheckIsEnemiesAlive()
-        {
-            for (int i = 0; i < enemies.Count; i++)
-            {
-                if (enemies[i].IsAlive == true)
-                {
-                    return true;
-                }
-            }
-
-            return false;
+            (_player as Player).Shot(_map);
+            //(_player as Player).Shooting += () => (_player as Enemy).Update(_graphics, _enemies, timer);
+            //timerShot.Enabled = true;
         }
 
         private void timerShot_Tick(object sender, EventArgs e)
         {
             pictureBoxMap.Invalidate();
+            //timerShot.Enabled = false;
         }
 
         private void AddEnemies()
         {
-            int enemyCount = random.Next(2, 8);
+            int enemyCount = 12;
             for (int i = 0; i < enemyCount; i++)
             {
-                int tempX = random.Next(0, map.Width);
-                int tempY = random.Next(0, map.Height);
-                while (map.CheckCanWalk(tempX, tempY, tempX + Resource.enemyRight.Width, tempY + Resource.enemyRight.Height) == false)
+                int tempX = _random.Next(0, _map.Width);
+                int tempY = _random.Next(0, _map.Height);
+                while (_map.CheckIfWall(tempX, tempY, tempX + Resource.enemyRight.Width, tempY + Resource.enemyRight.Height) == false)
                 {
-                    tempX = random.Next(0, map.Width);
-                    tempY = random.Next(0, map.Height);
+                    tempX = _random.Next(0, _map.Width);
+                    tempY = _random.Next(0, _map.Height);
                 }
-                enemies.Add(new Enemy(tempX, tempY));
-                enemeisTimers.Add(new Timer());
+                _enemies.Add(new Enemy(tempX, tempY, (_player as Player), _map));
+                _enemiesTimers.Add(new Timer());
             }
-        }
-
-        private void timerEnemyWalk_Tick(object sender, EventArgs e)
-        {
-            //for (int i = 0; i < enemies.Count; i++)
-            //{
-            //    (enemies[i] as Enemy).Walk(map);
-            //}
         }
     }
 }
