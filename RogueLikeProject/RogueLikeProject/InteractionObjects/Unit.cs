@@ -10,16 +10,15 @@ using System.Windows.Forms;
 
 namespace RogueLikeProject.GameWorld
 {
-
     //убрать лишние методы
     public delegate void DelShowStats(string str);
-    public class Unit : InteractionObject
+    public class Unit : InteractableObject
     {
         public int Hp { get; private set; }
         public int Damage { get; private set; }
         public bool IsAlive { get; private set; }
         public Vector2 Direction { get; private set; }
-        public List<Projectile> Projectiles { get; set; }
+        public Projectile Projectile { get; set; }
 
         public event Action Dying;
         public event Action HpChanged;
@@ -29,7 +28,6 @@ namespace RogueLikeProject.GameWorld
             Damage = damage;
             Hp = hp;
             Direction = new Vector2();
-            Projectiles = new List<Projectile>();
             Direction.DirectionX = 1;
             Direction.DirectionY = 0;
             IsAlive = true;
@@ -37,8 +35,9 @@ namespace RogueLikeProject.GameWorld
 
         public void Shot(Map map)
         {
-            Projectiles.Add(new Projectile(15, this, Resource.bulletRight, map));
-            SoundPlayer simpleSound = new SoundPlayer(@"C:\Users\ЧинякOFF\Downloads\z_uk-vystrel-s-pistoleta(1) (2) (1).wav");
+            Projectile = new Projectile(15, this, Resource.bulletRight, map);
+            this.Projectile.Hitting += () => this.Projectile = null;
+            SoundPlayer simpleSound = new SoundPlayer(Resource.z_uk_vystrel_s_pistoleta_1___2___1_);
             simpleSound.Play();
             //Projectile.EnemyHitting += OnEnemyHitting;
         }
@@ -64,11 +63,8 @@ namespace RogueLikeProject.GameWorld
 
         public void Update(List<Unit> enemies, Graphics graphics)
         {
-            for (int i = 0; i < Projectiles.Count; i++)
-            {
-                Projectiles[i]?.Move(enemies);
-                Projectiles[i]?.Print(graphics);
-            }
+            Projectile?.Move(enemies);
+            Projectile?.Print(graphics);
         }
     }
 }

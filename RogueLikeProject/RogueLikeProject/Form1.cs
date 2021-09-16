@@ -93,7 +93,7 @@ namespace RogueLikeProject
                 };
             }
 
-            (_player as Player).StatsChanged += () => (_player as Player).ShowStatistic(CheckCount);
+            (_player as Player).ScoreChanged += () => (_player as Player).ShowStatistic(CheckCount);
             (_player as Player).HpChanged += () => { (_player as Player).ShowHp(CheckHp); playerHealthBar.MarqueeAnimationSpeed = 0; };
         }
 
@@ -158,7 +158,7 @@ namespace RogueLikeProject
             {
                 int tempX = _random.Next(0, _map.Width);
                 int tempY = _random.Next(0, _map.Height);
-                while (_map.CheckIfWall(tempX, tempY, tempX + Resource.enemyRight.Width, tempY + Resource.enemyRight.Height) == false)
+                while (_map.CheckIfCanWalk(tempX, tempY, tempX + Resource.enemyRight.Width, tempY + Resource.enemyRight.Height) == false)
                 {
                     tempX = _random.Next(0, _map.Width);
                     tempY = _random.Next(0, _map.Height);

@@ -24,7 +24,7 @@ namespace RogueLikeProject.InteractionObjects
 
         public void Walk(Map map, Player player)
         {
-            if (Hp > 0)
+            if (IsAlive == true)
             {
                 switch (_random.Next(0, 6))
                 {
@@ -34,7 +34,7 @@ namespace RogueLikeProject.InteractionObjects
                         {
                             Direction.DirectionX = -1;
                             Direction.DirectionY = 0;
-                            if (map.CheckIfWall(X - Speed, Y, X + Sprite.Width - Speed, Y + Sprite.Height))
+                            if (map.CheckIfCanWalk(X - Speed, Y, X + Sprite.Width - Speed, Y + Sprite.Height))
                             {
                                 X -= Speed;
                             }
@@ -51,7 +51,7 @@ namespace RogueLikeProject.InteractionObjects
                         {
                             Direction.DirectionX = 1;
                             Direction.DirectionY = 0;
-                            if (map.CheckIfWall(X + Speed, Y, X + Sprite.Width + Speed, Y + Sprite.Height))
+                            if (map.CheckIfCanWalk(X + Speed, Y, X + Sprite.Width + Speed, Y + Sprite.Height))
                             {
                                 X += Speed;
                             }
@@ -68,7 +68,7 @@ namespace RogueLikeProject.InteractionObjects
                         {
                             Direction.DirectionX = 0;
                             Direction.DirectionY = -1;
-                            if (map.CheckIfWall(X, Y + Speed, X + Sprite.Width, Y + Sprite.Height + Speed))
+                            if (map.CheckIfCanWalk(X, Y + Speed, X + Sprite.Width, Y + Sprite.Height + Speed))
                             {
                                 Y += Speed;
                             }
@@ -85,7 +85,7 @@ namespace RogueLikeProject.InteractionObjects
                         {
                             Direction.DirectionX = 0;
                             Direction.DirectionY = 1;
-                            if (map.CheckIfWall(X, Y - Speed, X + Sprite.Width, Y + Sprite.Height - Speed))
+                            if (map.CheckIfCanWalk(X, Y - Speed, X + Sprite.Width, Y + Sprite.Height - Speed))
                             {
                                 Y -= Speed;
                             }
