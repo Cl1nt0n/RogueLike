@@ -12,14 +12,14 @@ namespace RogueLikeProject.GameWorld
     //разобраться с событиями
     public delegate void EnemyHitting(int damage, Map map);
 
-    public class Projectile : InteractionObject
+    public class Projectile : InteractableObject
     {
         public Vector2 Direction { get; private set; }
 
         private Unit _source;
         private Map _map;
 
-        public event Action WallHitting;
+        public event Action Hitting;
         public event Action KillingEnemy;
 
         public Projectile(int speed, Unit player, Image sprite, Map map) : base(player.X, player.Y, sprite.Width, sprite.Height, speed, sprite)
@@ -27,129 +27,140 @@ namespace RogueLikeProject.GameWorld
             Direction = new Vector2();
             _source = player;
             _map = map;
-            WallHitting?.Invoke();
             KillingEnemy?.Invoke();
-            SetStartBulletPosition();
+            SetStartPosition();
         }
 
-        public void SetStartBulletPosition()
+        public void SetStartPosition()
         {
             if (_source.Direction.DirectionX == 1 && _source.Direction.DirectionY == 0)
             {
                 X += 25;
                 Y += 7;
-                Direction.DirectionX = 1;
-                Direction.DirectionY = 0;
-                Sprite = Resource.bulletRight;
+                NewMethod(1, 0, Resource.bulletRight);
             }
             if (_source.Direction.DirectionX == -1 && _source.Direction.DirectionY == 0)
             {
                 Y += 3;
-                Direction.DirectionX = -1;
-                Direction.DirectionY = 0;
-                Sprite = Resource.bulletLeft;
+                NewMethod(-1, 0, Resource.bulletLeft);
             }
             if (_source.Direction.DirectionX == 0 && _source.Direction.DirectionY == 1)
             {
                 X += 7;
-                Direction.DirectionX = 0;
-                Direction.DirectionY = 1;
-                Sprite = Resource.bulletUp;
+                NewMethod(0, 1, Resource.bulletUp);
             }
             if (_source.Direction.DirectionX == 0 && _source.Direction.DirectionY == -1)
             {
                 Y += 25;
                 X += 3;
-                Direction.DirectionX = 0;
-                Direction.DirectionY = -1;
-                Sprite = Resource.bulletDown;
+                NewMethod(0, -1, Resource.bulletDown);
             }
+        }
+
+        private void NewMethod(int x, int y, Image sprite)
+        {
+            Direction.DirectionX = x;
+            Direction.DirectionY = y;
+            Sprite = sprite;
         }
 
         public void Move(List<Unit> enemies)
         {
             if (Direction.DirectionX == 1 && Direction.DirectionY == 0)
             {
-                if (_map.CheckIfWall(X + Speed, Y, X + Sprite.Width + Speed, Y + Sprite.Height) && IfProjectileHit(enemies))
-                {
-                    X += Speed;
-                }
-                else
-                {
-                    for (int i = Speed; i >= 0; i--)
-                    {
-                        if (_map.CheckIfWall(X + i, Y, X + Sprite.Width + i, Y + Sprite.Height))
-                        {
-                            X += i;
-                        }
-                    }
-
-                    _source.Projectiles[_source.Projectiles.Count - 1] = null;
-                }
+                NewMethod1(enemies, Speed, 0);
             }
             if (Direction.DirectionX == -1 && Direction.DirectionY == 0)
             {
-                if (_map.CheckIfWall(X - Speed, Y, X + Sprite.Width - Speed, Y + Sprite.Height) && IfProjectileHit(enemies))
+                if (_map.CheckIfCanWalk(X - Speed, Y, X + Sprite.Width - Speed, Y + Sprite.Height) && CheckEnemyHit(enemies))
                 {
                     X -= Speed;
                 }
                 else
                 {
-                    for (int i = Speed; i >= 0; i--)
+                    if (_map.CheckIfCanWalk(X - Speed, Y, X + Sprite.Width - Speed, Y + Sprite.Height) == false)
                     {
-                        if (_map.CheckIfWall(X - i, Y, X + Sprite.Width - i, Y + Sprite.Height))
+                        for (int i = Speed; i >= 0; i--)
                         {
-                            X -= i;
+                            if (_map.CheckIfCanWalk(X - i, Y, X + Sprite.Width - i, Y + Sprite.Height))
+                            {
+                                X -= i;
+                            }
                         }
                     }
-
-                    _source.Projectiles[_source.Projectiles.Count - 1] = null;
                 }
             }
             if (Direction.DirectionX == 0 && Direction.DirectionY == 1)
             {
-                if (_map.CheckIfWall(X, Y - Speed, X + Sprite.Width, Y + Sprite.Height - Speed) && IfProjectileHit(enemies))
+                if (_map.CheckIfCanWalk(X, Y - Speed, X + Sprite.Width, Y + Sprite.Height - Speed) && CheckEnemyHit(enemies))
                 {
                     Y -= Speed;
                 }
                 else
                 {
-                    for (int i = Speed; i >= 0; i--)
+                    if (_map.CheckIfCanWalk(X, Y - Speed, X + Sprite.Width, Y + Sprite.Height - Speed) == false)
                     {
-                        if (_map.CheckIfWall(X, Y - i, X + Sprite.Width, Y + Sprite.Height - i))
+                        for (int i = Speed; i >= 0; i--)
                         {
-                            Y -= i;
+                            if (_map.CheckIfCanWalk(X, Y - i, X + Sprite.Width, Y + Sprite.Height - i))
+                            {
+                                Y -= i;
+                            }
                         }
                     }
-
-                    _source.Projectiles[_source.Projectiles.Count - 1] = null;
                 }
             }
             if (Direction.DirectionX == 0 && Direction.DirectionY == -1)
             {
-                if (_map.CheckIfWall(X, Y + Speed, X + Sprite.Width, Y + Sprite.Height + Speed) && IfProjectileHit(enemies))
+                if (_map.CheckIfCanWalk(X, Y + Speed, X + Sprite.Width, Y + Sprite.Height + Speed) && CheckEnemyHit(enemies))
                 {
                     Y += Speed;
                 }
                 else
                 {
-                    if (_map.CheckIfWall(X, Y + Speed, X + Sprite.Width, Y + Sprite.Height + Speed) == false)
+                    if (_map.CheckIfCanWalk(X, Y + Speed, X + Sprite.Width, Y + Sprite.Height + Speed) == false)
                     {
                         for (int i = Speed; i >= 0; i--)
                         {
-                            if (_map.CheckIfWall(X, Y + i, X + Sprite.Width, Y + Sprite.Height + i))
+                            if (_map.CheckIfCanWalk(X, Y + i, X + Sprite.Width, Y + Sprite.Height + i))
                             {
                                 Y += i;
                             }
                         }
                     }
-
-                    _source.Projectiles[_source.Projectiles.Count - 1] = null;
                 }
             }
         }
 
-        public bool IfProjectileHit(List<Unit> enemies)
+        private void NewMethod1(List<Unit> enemies, int xspeed, int yspeed)
+        {
+            int XSpeed = xspeed;
+            int YSpeed = yspeed;
+            if (_map.CheckIfCanWalk(X + XSpeed, Y + YSpeed, X + Sprite.Width + XSpeed, Y + Sprite.Height + YSpeed) && CheckEnemyHit(enemies))
+            {
+                X += XSpeed;
+                Y += YSpeed;
+            }
+            else
+            {
+                if (_map.CheckIfCanWalk(X + XSpeed, Y + YSpeed, X + Sprite.Width + XSpeed, Y + Sprite.Height + YSpeed) == false)
+                {
+                    for (int i = Math.Abs(XSpeed); i >= 0; i--)
+                    {
+                        for (int j = Math.Abs(YSpeed); j >= 0; j--)
+                        {
+                            if (_map.CheckIfCanWalk(X + i, Y + j, X + Sprite.Width + i, Y + Sprite.Height + j))
+                            {
+                                X += Math.Sign(XSpeed) * i;
+                                Y += Math.Sign(YSpeed) * j;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        public bool CheckEnemyHit(List<Unit> enemies)
         {
             for (int i = 0; i < enemies.Count; i++)
             {
@@ -159,8 +170,24 @@ namespace RogueLikeProject.GameWorld
                     && enemies[i].IsAlive == true)
                 {
                     enemies[i].TakeDamage(_source.Damage, _map);
+                    Hitting?.Invoke();
                     return false;
                 }
+            }
+
+            return true;
+        }
+
+        public bool CheckEnemyHit(Unit unit)
+        {
+            if (X >= unit.X &&
+                X + Sprite.Width <= unit.X + unit.Sprite.Width &&
+                Y >= unit.Y && Y <= unit.Y + unit.Sprite.Height
+                && unit.IsAlive == true)
+            {
+                unit.TakeDamage(_source.Damage, _map);
+                Hitting?.Invoke();
+                return false;
             }
 
             return true;

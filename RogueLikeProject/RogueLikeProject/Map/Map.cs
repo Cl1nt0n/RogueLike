@@ -17,7 +17,7 @@ namespace RogueLikeProject.GameWorld
         public List<Wall> Walls { get; private set; }
         public List<Floor> Floors { get; private set; }
 
-        private int _oneCellWidth;
+        private int _cellSize;
 
         public Map()
         {
@@ -25,16 +25,16 @@ namespace RogueLikeProject.GameWorld
             Floors = new List<Floor>();
             _random = new Random();
 
-            _oneCellWidth = 40;
+            _cellSize = 40;
             Width = 800;
             Height = 800;
         }
 
         public void Load()
         {
-            for (int i = 0; i < Width; i += _oneCellWidth)
+            for (int i = 0; i < Width; i += _cellSize)
             {
-                for (int j = 0; j < Height; j += _oneCellWidth)
+                for (int j = 0; j < Height; j += _cellSize)
                 {
                     switch (_random.Next(0, 10))
                     {
@@ -49,7 +49,7 @@ namespace RogueLikeProject.GameWorld
             }
         }
 
-        public bool CheckIfWall(int xTopLeft, int yTopLeft, int xRightBottom, int yRightBottom)
+        public bool CheckIfCanWalk(int xTopLeft, int yTopLeft, int xRightBottom, int yRightBottom)
         {
             foreach (var wall in Walls)
             {

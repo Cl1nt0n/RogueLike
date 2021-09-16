@@ -5,24 +5,25 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RogueLikeProject.GameWorld
+namespace RogueLikeProject.InteractionObjects
 {
-    public class MapElement
+    public class InteractableObject
     {
         public int X { get; set; }
         public int Y { get; set; }
+        public int Width { get; private set; }
+        public int Height { get; private set; }
+        public int Speed { get; private set; }
         public Image Sprite { get; set; }
-        public int Width { get; set; }
-        public int Height { get; set; }
 
-        public MapElement(Image sprite)
+        public InteractableObject(int x, int y, int width, int height, int speed, Image sprite)
         {
+            X = x;
+            Y = y;
+            Width = width;
+            Height = height;
             Sprite = sprite;
-            Width = sprite.Width;
-            Height = sprite.Height;
-
-            int tempX = X;
-            int tempY = Y;
+            Speed = speed;
         }
 
         public virtual void Print(Graphics graphics)

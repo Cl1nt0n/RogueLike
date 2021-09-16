@@ -10,20 +10,19 @@ namespace RogueLikeProject.InteractionObjects
 {
     public class Player : Unit
     {
-        public int Count { get; private set; }
-        public event Action StatsChanged;
-
+        public int Score { get; private set; }
+        public event Action ScoreChanged;
 
         public Player(Map map) : base(Resource.playerRight, 1, 1, 900, 100, map)
         {
-            Count = 0;
+            Score = 0;
             Dying += () => Sprite = Resource.deadPlayer;
             Dying += () => MessageBox.Show("Вы были попущены :/");
         }
 
         public void Walk(Map map, KeyEventArgs keyDown)
         {
-            if (Hp > 0)
+            if (IsAlive == true)
             {
                 switch (keyDown.KeyData)
                 {
@@ -34,7 +33,7 @@ namespace RogueLikeProject.InteractionObjects
                             Direction.DirectionX = -1;
                             Direction.DirectionY = 0;
 
-                            if (map.CheckIfWall(X - Speed, Y, X + Sprite.Width - Speed, Y + Sprite.Height))
+                            if (map.CheckIfCanWalk(X - Speed, Y, X + Sprite.Width - Speed, Y + Sprite.Height))
                             {
                                 X -= Speed;
                             }
@@ -42,7 +41,7 @@ namespace RogueLikeProject.InteractionObjects
                             {
                                 for (int i = Speed; i >= 0; i--)
                                 {
-                                    if (map.CheckIfWall(X - i, Y, X + Sprite.Width - i, Y + Sprite.Height))
+                                    if (map.CheckIfCanWalk(X - i, Y, X + Sprite.Width - i, Y + Sprite.Height))
                                     {
                                         X -= i;
                                     }
@@ -56,7 +55,7 @@ namespace RogueLikeProject.InteractionObjects
                         {
                             Direction.DirectionX = 1;
                             Direction.DirectionY = 0;
-                            if (map.CheckIfWall(X + Speed, Y, X + Sprite.Width + Speed, Y + Sprite.Height))
+                            if (map.CheckIfCanWalk(X + Speed, Y, X + Sprite.Width + Speed, Y + Sprite.Height))
                             {
                                 X += Speed;
                             }
@@ -64,7 +63,7 @@ namespace RogueLikeProject.InteractionObjects
                             {
                                 for (int i = Speed; i >= 0; i--)
                                 {
-                                    if (map.CheckIfWall(X + i, Y, X + Sprite.Width + i, Y + Sprite.Height))
+                                    if (map.CheckIfCanWalk(X + i, Y, X + Sprite.Width + i, Y + Sprite.Height))
                                     {
                                         X += i;
                                     }
@@ -78,7 +77,7 @@ namespace RogueLikeProject.InteractionObjects
                         {
                             Direction.DirectionX = 0;
                             Direction.DirectionY = -1;
-                            if (map.CheckIfWall(X, Y + Speed, X + Sprite.Width, Y + Sprite.Height + Speed))
+                            if (map.CheckIfCanWalk(X, Y + Speed, X + Sprite.Width, Y + Sprite.Height + Speed))
                             {
                                 Y += Speed;
                             }
@@ -86,7 +85,7 @@ namespace RogueLikeProject.InteractionObjects
                             {
                                 for (int i = Speed; i >= 0; i--)
                                 {
-                                    if (map.CheckIfWall(X, Y + i, X + Sprite.Width, Y + Sprite.Height + i))
+                                    if (map.CheckIfCanWalk(X, Y + i, X + Sprite.Width, Y + Sprite.Height + i))
                                     {
                                         Y += i;
                                     }
@@ -100,7 +99,7 @@ namespace RogueLikeProject.InteractionObjects
                         {
                             Direction.DirectionX = 0;
                             Direction.DirectionY = 1;
-                            if (map.CheckIfWall(X, Y - Speed, X + Sprite.Width, Y + Sprite.Height - Speed))
+                            if (map.CheckIfCanWalk(X, Y - Speed, X + Sprite.Width, Y + Sprite.Height - Speed))
                             {
                                 Y -= Speed;
                             }
@@ -108,7 +107,7 @@ namespace RogueLikeProject.InteractionObjects
                             {
                                 for (int i = Speed; i >= 0; i--)
                                 {
-                                    if (map.CheckIfWall(X, Y - i, X + Sprite.Width, Y + Sprite.Height - i))
+                                    if (map.CheckIfCanWalk(X, Y - i, X + Sprite.Width, Y + Sprite.Height - i))
                                     {
                                         Y -= i;
                                     }
@@ -122,13 +121,13 @@ namespace RogueLikeProject.InteractionObjects
 
         public void TakeBounty(int bounty)
         {
-            Count += bounty;
-            StatsChanged?.Invoke();
+            Score += bounty;
+            ScoreChanged?.Invoke();
         }
 
         public void ShowStatistic(DelShowStats Statistics)
         {
-            Statistics(Count.ToString());
+            Statistics(Score.ToString());
         }
 
         public void ShowHp(DelShowStats Statistics)
@@ -141,7 +140,7 @@ namespace RogueLikeProject.InteractionObjects
             Random random = new Random();
             X = random.Next(0, map.Width);
             Y = random.Next(0, map.Height);
-            while (map.CheckIfWall(X, Y, X + Sprite.Width, Y + Sprite.Height) == false)
+            while (map.CheckIfCanWalk(X, Y, X + Sprite.Width, Y + Sprite.Height) == false)
             {
                 X = random.Next(0, map.Width);
                 Y = random.Next(0, map.Height);
